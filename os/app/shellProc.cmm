@@ -98,6 +98,13 @@ void demoScreen_org() {
 void demoScreen() {
   cls();                                            // LCDをクリアする
   disp_title(0);
+  disp_playing(true);
+  disp_shuffle(true);
+  disp_repeat(false);
+  locateXY(0,7); putCh('<');
+  locateXY(4,7); putCh('>');
+  locateXY(7,7); putCh('r');
+  locateXY(10,7); putCh('r');
 }
 
 void asta(int y) {

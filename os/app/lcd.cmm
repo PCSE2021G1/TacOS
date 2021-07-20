@@ -40,6 +40,12 @@ char[] locateCom = { '\xb0',   // page address
                      '\x00',   // column address Lo = 0x00
                      '\xff' }; // EOF
 
+char[] boh = {'\x00','\x00','\x00','\x77','\x77','\x00','\x00','\x00'};
+
+public void putboh(){
+    spiWriteLcdDat(boh, 8);
+}
+
 // 液晶上でカーソルを(x,y)に移動
 public void locateXY(int x, int y) {
   int x8 = x * 8;
