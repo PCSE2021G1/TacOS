@@ -30,6 +30,7 @@
 #include <kernel.hmm>
 #include <util.hmm>
 #include "lcd.hmm"
+#include "lcd2.hmm"
 #include "mp3Proc.hmm"
 #include "spi.hmm"
 #include "mp3Files.hmm"
@@ -80,7 +81,7 @@ int swToNum(int sw) {
 //-----------------------------------------------------------------------------
 // 画面表示
 //-----------------------------------------------------------------------------
-void demoScreen() {
+void demoScreen_org() {
   cls();                                            // LCDをクリアする
   locateXY(0,0); putStr("MP3 Player demo");
   for (int i=1; i<=5; i=i+1) {                      // スイッチ1〜5に付いて
@@ -92,6 +93,11 @@ void demoScreen() {
   }
   locateXY(2,7);
   putStr("6:stop");                                 // 6番のスイッチ
+}
+
+void demoScreen() {
+  cls();                                            // LCDをクリアする
+  disp_title(0);
 }
 
 void asta(int y) {
