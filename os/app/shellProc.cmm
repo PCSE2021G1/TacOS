@@ -97,7 +97,8 @@ void demoScreen_org() {
 
 void demoScreen() {
   cls();                                            // LCDをクリアする
-  disp_title(0);
+  disp_playlist(0);
+  disp_title(0,0);
   disp_playing(true);
   disp_shuffle(true);
   disp_repeat(false);

@@ -32,3 +32,4 @@ public void putStr(char[] str);            // カーソル位置に文字列表�
 public void putDec(int val, int width);    // カーソル位置に10進数表示
 public void cls();                         // 画面のクリア
 public void putboh();
+public void putplaylistfont(int i, int j); //プレイリストの絵の1文字分を表示
