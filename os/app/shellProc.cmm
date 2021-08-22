@@ -36,6 +36,32 @@
 #include "mp3Files.hmm"
 #include "shellProc.hmm"
 
+int N = 6;
+int cc = 0; //cursor count: 何番目をカーソルで照らすかを示す
+int pc = 0; //playlist count: 先頭に表示するプレイリストは何番目かを示す
+
+int min(int x,int y){
+    if(x<=y) return x;
+    else return y;
+    return 0;
+}
+
+int max(int x,int y){
+    if(x>=y) return x;
+    else return y;
+    return 0;
+}
+
+void inc(){
+    if(cc==3) pc=min(pc+1,N-4);
+    else cc = cc+1;
+}
+
+void dec(){
+    if(cc==0) pc=max(pc-1,0);
+    else cc = cc-1;
+}
+
 //-----------------------------------------------------------------------------
 // スイッチの読み取り
 //-----------------------------------------------------------------------------
@@ -97,7 +123,7 @@ void demoScreen_org() {
 
 void demoScreen() {
   cls();                                            // LCDをクリアする
-  disp_playlist(0);
+  disp_playlist(pc);
   disp_title(0,0);
   disp_playing(true);
   disp_shuffle(true);
@@ -126,7 +152,13 @@ public void shellMain() {
   for (;;) {
     int sw = readSw();
     int num = swToNum(sw);
-    if (num==6) {                                   // 6 番のスイッチが押された
+    if (num==2){
+      dec();
+      demoScreen();
+    } else if (num==3){
+      inc();
+      demoScreen();
+    } else if (num==6) {                                   // 6 番のスイッチが押された
       dbgPutStr("stop\n");
       demoScreen();                                 // 画面を初期化
       stop();
