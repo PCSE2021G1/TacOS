@@ -123,7 +123,7 @@ void demoScreen_org() {
 
 void demoScreen() {
   cls();                                            // LCDをクリアする
-  disp_playlist(pc);
+  disp_playlist(pc, cc);
   disp_title(0,0);
   disp_playing(true);
   disp_shuffle(true);
