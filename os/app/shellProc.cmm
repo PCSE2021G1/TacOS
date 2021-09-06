@@ -39,6 +39,10 @@
 int N = 6;
 int cc = 0; //cursor count: 何番目をカーソルで照らすかを示す
 int pc = 0; //playlist count: 先頭に表示するプレイリストは何番目かを示す
+int bottom_cursor = 0; //下のカーソル
+boolean isplaying = false;
+boolean isshuffle = false;
+boolean isrepeat = false;
 
 int min(int x,int y){
     if(x<=y) return x;
@@ -123,13 +127,9 @@ void demoScreen_org() {
 
 void demoScreen() {
   cls();                                            // LCDをクリアする
-  disp_playlist(pc, cc);
+  disp_top(pc, cc);
   disp_title(0,0);
-  disp_playing(true);
-  disp_shuffle(true);
-  disp_repeat(false);
-  locateXY(0,7); putCh('<');
-  locateXY(4,7); putCh('>');
+  disp_bottom(bottom_cursor, isplaying, isshuffle, isrepeat);
   locateXY(7,7); putCh('r');
   locateXY(10,7); putCh('r');
 }
@@ -158,10 +158,34 @@ public void shellMain() {
     } else if (num==3){
       inc();
       demoScreen();
-    } else if (num==6) {                                   // 6 番のスイッチが押された
-      dbgPutStr("stop\n");
+    } else if(num==4){
+      bottom_cursor = max(bottom_cursor-1, 0);
+      demoScreen();
+    } else if(num==5){
+      if(bottom_cursor==0){
+        //一曲飛ばす
+      }
+      else if(bottom_cursor==1){
+        //再生・停止を切り替え
+        isplaying = !isplaying;
+      }
+      else if(bottom_cursor==2){
+        //一曲戻す
+      }
+      else if(bottom_cursor==3){
+        //シャッフル切り替え
+        isshuffle = !isshuffle;
+      }
+      else if(bottom_cursor==4){
+        //リピート切り替え
+        isrepeat = !isrepeat;
+      }
       demoScreen();                                 // 画面を初期化
-      stop();
+    } else if (num==6){
+      bottom_cursor = min(bottom_cursor+1, 4);
+      //dbgPutStr("stop\n");
+      demoScreen();                                 // 画面を初期化
+      //stop();
     } else if (num>0 && mp3FilesGetName(num)!=null) { // ファイルと対応するボタン
       demoScreen();                                 // 画面を初期化
       asta(num);                                    // 再生中の曲に印を表示

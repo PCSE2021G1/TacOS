@@ -124,7 +124,7 @@ char[] locateCom = { '\xb0',   // page address
                      '\x00',   // column address Lo = 0x00
                      '\xff' }; // EOF
 
-char[] font_tmp = { '\xff','\x81','\x81','\x81','\x81','\x81','\x81','\xff' };
+char[] font_tmp = { '\x00','\x00','\x00','\x00','\x00','\x00','\x00','\x00' };
 
 public void putplaylistfont(int i, int j, boolean iscursor){
   if(iscursor){
@@ -136,7 +136,33 @@ public void putplaylistfont(int i, int j, boolean iscursor){
       font_tmp[k] = chr(playlist_font[i][j][k]);
     }
   }spiWriteLcdDat(font_tmp, 8);
+}
 
+int[][] operation_font_list = {
+  { 0x08, 0x1c, 0x36, 0x63, 0x41, 0x00, 0x00, 0x00 }, //leftarrow
+  { 0x08, 0x08, 0x3e, 0x3e, 0x08, 0x08, 0x00, 0x00 }, //playing
+  { 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x00, 0x00 }, //stop
+  { 0x00, 0x41, 0x63, 0x36, 0x1c, 0x08, 0x00, 0x00 }, //rightarrow
+  { 0x3e, 0x7f, 0x71, 0x59, 0x4d, 0x7f, 0x3e, 0x00 }, //maru
+  { 0x60, 0x30, 0x18, 0x0c, 0x06, 0x03, 0x01, 0x00 } //batu
+};
+
+int[] cursor_font = { 0xff, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xff };
+
+char[] font_tmp2 = { '\x00','\x00','\x00','\x00','\x00','\x00','\x00','\x00' };
+int[] operation_font = { 0x60, 0x30, 0x18, 0x0c, 0x06, 0x03, 0x01, 0x00 };
+
+public void putoperationfont(int operation_id, boolean iscursor){
+  operation_font = operation_font_list[operation_id];
+  if(iscursor){
+    for(int k=0; k<8; k=k+1){
+      font_tmp2[k] = chr(operation_font[k] | cursor_font[k]);
+    }
+  }else{
+    for(int k=0; k<8; k=k+1){
+      font_tmp2[k] = chr(operation_font[k]);
+    }
+  }spiWriteLcdDat(font_tmp2, 8);
 }
 
 // 液晶上でカーソルを(x,y)に移動
