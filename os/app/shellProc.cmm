@@ -37,12 +37,14 @@
 #include "shellProc.hmm"
 
 int N = 6;
-int cc = 0; //cursor count: 何番目をカーソルで照らすかを示す
-int pc = 0; //playlist count: 先頭に表示するプレイリストは何番目かを示す
+int top_cursor = 0;
+int head_playlist = 0; //playlist count: 先頭に表示するプレイリストは何番目かを示す
 int bottom_cursor = 0; //下のカーソル
 boolean isplaying = false;
 boolean isshuffle = false;
 boolean isrepeat = false;
+int playing_plyalist_id = 0;
+int playing_music_id = 0;
 
 int min(int x,int y){
     if(x<=y) return x;
@@ -57,13 +59,13 @@ int max(int x,int y){
 }
 
 void inc(){
-    if(cc==3) pc=min(pc+1,N-4);
-    else cc = cc+1;
+    if(top_cursor==3) head_playlist=min(head_playlist+1,N-4);
+    else top_cursor = top_cursor+1;
 }
 
 void dec(){
-    if(cc==0) pc=max(pc-1,0);
-    else cc = cc-1;
+    if(top_cursor==0) head_playlist=max(head_playlist-1,0);
+    else top_cursor = top_cursor-1;
 }
 
 //-----------------------------------------------------------------------------
@@ -125,20 +127,29 @@ void demoScreen_org() {
   putStr("6:stop");                                 // 6番のスイッチ
 }
 
+char[] shuffle_font1 = { '\x94', '\x54', '\x34', '\x00', '\x28', '\x20', '\x18', '\x00' };
+char[] shuffle_font2 = { '\x2c', '\x24', '\xfc', '\x02', '\x31', '\x28', '\x24', '\x70' };
+char[] repeat_font1 = { '\x00', '\x0c', '\x40', '\x3c', '\x00', '\x3c', '\x28', '\x28' };
+char[] repeat_font2 = { '\x04', '\x10', '\x10', '\x00', '\x3c', '\x10', '\x00', '\x00' };
+
 void demoScreen() {
   cls();                                            // LCDをクリアする
-  disp_top(pc, cc);
-  disp_title(0,0);
+  disp_top(head_playlist, top_cursor);
+  disp_title(playing_plyalist_id, playing_music_id);
   disp_bottom(bottom_cursor, isplaying, isshuffle, isrepeat);
-  locateXY(7,7); putCh('r');
-  locateXY(10,7); putCh('r');
+  locateXY(7,7);spiWriteLcdDat(shuffle_font1, 8);
+  locateXY(8,7);spiWriteLcdDat(shuffle_font2, 8);
+  locateXY(11,7);spiWriteLcdDat(repeat_font1, 8);
+  locateXY(12,7);spiWriteLcdDat(repeat_font2, 8);
+  
 }
-
+/*
 void asta(int y) {
   demoScreen();
   locateXY(0, y+1);
   putCh('*');
 }
+*/
 
 //-----------------------------------------------------------------------------
 // MP3 プレーヤのメインプロセス
@@ -152,18 +163,19 @@ public void shellMain() {
   for (;;) {
     int sw = readSw();
     int num = swToNum(sw);
-    if (num==2){
+    if (num==1){
+      playing_plyalist_id = head_playlist+top_cursor;
+      playing_music_id = 0;
+    }else if (num==2){
       dec();
-      demoScreen();
     } else if (num==3){
       inc();
-      demoScreen();
     } else if(num==4){
       bottom_cursor = max(bottom_cursor-1, 0);
-      demoScreen();
     } else if(num==5){
       if(bottom_cursor==0){
         //一曲飛ばす
+        //playing_music_idを増やしたり，もう増えないようにしたり
       }
       else if(bottom_cursor==1){
         //再生・停止を切り替え
@@ -171,6 +183,7 @@ public void shellMain() {
       }
       else if(bottom_cursor==2){
         //一曲戻す
+        //playing_music_idを減らしたり，もう減らないようにしたり
       }
       else if(bottom_cursor==3){
         //シャッフル切り替え
@@ -180,19 +193,16 @@ public void shellMain() {
         //リピート切り替え
         isrepeat = !isrepeat;
       }
-      demoScreen();                                 // 画面を初期化
     } else if (num==6){
       bottom_cursor = min(bottom_cursor+1, 4);
-      //dbgPutStr("stop\n");
-      demoScreen();                                 // 画面を初期化
-      //stop();
-    } else if (num>0 && mp3FilesGetName(num)!=null) { // ファイルと対応するボタン
+    }/* else if (num>0 && mp3FilesGetName(num)!=null) { // ファイルと対応するボタン
       demoScreen();                                 // 画面を初期化
       asta(num);                                    // 再生中の曲に印を表示
       play(mp3FilesGetPath(num));                   // 再生開始
       dbgPutStr(mp3FilesGetPath(num));
       dbgPutStr("\n");
-    }
+    }*/
+    demoScreen();
     sleep(10);                                      // 10ms に一度
   }
 }
