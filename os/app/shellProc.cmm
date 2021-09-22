@@ -45,6 +45,8 @@ boolean isshuffle = false;
 boolean isrepeat = false;
 int playing_plyalist_id = 0;
 int playing_music_id = 0;
+int cnt = 0;
+boolean issleep = false;
 
 int min(int x,int y){
     if(x<=y) return x;
@@ -151,6 +153,12 @@ void asta(int y) {
 }
 */
 
+void set_sleep(){
+  issleep = true;
+  cnt = 0;
+  cls();
+}
+
 //-----------------------------------------------------------------------------
 // MP3 プレーヤのメインプロセス
 //-----------------------------------------------------------------------------
@@ -163,46 +171,54 @@ public void shellMain() {
   for (;;) {
     int sw = readSw();
     int num = swToNum(sw);
-    if (num==1){
-      playing_plyalist_id = head_playlist+top_cursor;
-      playing_music_id = 0;
-    }else if (num==2){
-      dec();
-    } else if (num==3){
-      inc();
-    } else if(num==4){
-      bottom_cursor = max(bottom_cursor-1, 0);
-    } else if(num==5){
-      if(bottom_cursor==0){
-        //一曲飛ばす
-        //playing_music_idを増やしたり，もう増えないようにしたり
+    if(issleep){
+      if (num==3) issleep = false;
+      cnt = (cnt+1)%2000;
+      if(cnt%100==0)cls();disp_fish(cnt/100);
+      sleep(10);
+    }else{
+      demoScreen();
+      if (num==1){
+        playing_plyalist_id = head_playlist+top_cursor;
+        playing_music_id = 0;
+      }else if (num==2){
+        dec();
+      } else if (num==3){
+        inc();
+        set_sleep();
+      } else if(num==4){
+        bottom_cursor = max(bottom_cursor-1, 0);
+      } else if(num==5){
+        if(bottom_cursor==0){
+          //一曲飛ばす
+          //playing_music_idを増やしたり，もう増えないようにしたり
+        }
+        else if(bottom_cursor==1){
+          //再生・停止を切り替え
+          isplaying = !isplaying;
+        }
+        else if(bottom_cursor==2){
+          //一曲戻す
+          //playing_music_idを減らしたり，もう減らないようにしたり
+        }
+        else if(bottom_cursor==3){
+          //シャッフル切り替え
+          isshuffle = !isshuffle;
+        }
+        else if(bottom_cursor==4){
+          //リピート切り替え
+          isrepeat = !isrepeat;
+        }
+      } else if (num==6){
+        bottom_cursor = min(bottom_cursor+1, 4);
+      }/* else if (num>0 && mp3FilesGetName(num)!=null) { // ファイルと対応するボタン
+        demoScreen();                                 // 画面を初期化
+        asta(num);                                    // 再生中の曲に印を表示
+        play(mp3FilesGetPath(num));                   // 再生開始
+        dbgPutStr(mp3FilesGetPath(num));
+        dbgPutStr("\n");
+      }*/
       }
-      else if(bottom_cursor==1){
-        //再生・停止を切り替え
-        isplaying = !isplaying;
-      }
-      else if(bottom_cursor==2){
-        //一曲戻す
-        //playing_music_idを減らしたり，もう減らないようにしたり
-      }
-      else if(bottom_cursor==3){
-        //シャッフル切り替え
-        isshuffle = !isshuffle;
-      }
-      else if(bottom_cursor==4){
-        //リピート切り替え
-        isrepeat = !isrepeat;
-      }
-    } else if (num==6){
-      bottom_cursor = min(bottom_cursor+1, 4);
-    }/* else if (num>0 && mp3FilesGetName(num)!=null) { // ファイルと対応するボタン
-      demoScreen();                                 // 画面を初期化
-      asta(num);                                    // 再生中の曲に印を表示
-      play(mp3FilesGetPath(num));                   // 再生開始
-      dbgPutStr(mp3FilesGetPath(num));
-      dbgPutStr("\n");
-    }*/
-    demoScreen();
     sleep(10);                                      // 10ms に一度
   }
 }
