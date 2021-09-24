@@ -153,9 +153,28 @@ void asta(int y) {
 }
 */
 
+int mylfsr = 1;
+int myrand() {
+  mylfsr = ((mylfsr >> 1) & 0x7fff) ^ (-(mylfsr & 1) & 0xb400); 
+  return mylfsr;
+}
+
+int current_y;
+void move_y(){
+  int val = myrand()%3;
+  if(val==0){
+    current_y = max(0,current_y-1);
+  }else if(val==1){
+    current_y = current_y;
+  }else if(val==2){
+    current_y = min(5,current_y+1);
+  }
+}
+
 void set_sleep(){
   issleep = true;
   cnt = 0;
+  current_y = myrand()%7;
   cls();
 }
 
@@ -174,7 +193,7 @@ public void shellMain() {
     if(issleep){
       if (num==3) issleep = false;
       cnt = (cnt+1)%2000;
-      if(cnt%100==0)cls();disp_fish(cnt/100);
+      if(cnt%100==0){cls();move_y();disp_fish(cnt/100, current_y);}
       sleep(10);
     }else{
       demoScreen();
