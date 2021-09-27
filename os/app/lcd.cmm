@@ -239,12 +239,3 @@ public void disp_fish(int x, int y){
       locateXY(i,y+2);spiWriteLcdDat(fish_font_list[3*(x-i)+2], 8);
   }
 }
-
-/*public void disp_fish(int cnt){
-  for (int i=cnt; (i>cnt-4) && (i>=0); i=i-1){
-      locateXY(i,3);spiWriteLcdDat(fish_font_list[3*(cnt-i)], 8);
-      locateXY(i,4);spiWriteLcdDat(fish_font_list[3*(cnt-i)+1], 8);
-      locateXY(i,5);spiWriteLcdDat(fish_font_list[3*(cnt-i)+2], 8);
-  }
-}
-*/
