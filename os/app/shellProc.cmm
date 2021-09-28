@@ -36,7 +36,8 @@
 #include "mp3Files.hmm"
 #include "shellProc.hmm"
 
-int N = 6;
+#define N 6
+
 int top_cursor = 0;
 int head_playlist = 0; //playlist count: 先頭に表示するプレイリストは何番目かを示す
 int bottom_cursor = 0; //下のカーソル
@@ -46,6 +47,7 @@ boolean isrepeat = false;
 int playing_plyalist_id = 0;
 int playing_music_id = 0;
 int cnt = 0;
+int sleep_cnt = 0;
 boolean issleep = false;
 
 int min(int x,int y){
@@ -115,19 +117,6 @@ int swToNum(int sw) {
 //-----------------------------------------------------------------------------
 // 画面表示
 //-----------------------------------------------------------------------------
-void demoScreen_org() {
-  cls();                                            // LCDをクリアする
-  locateXY(0,0); putStr("MP3 Player demo");
-  for (int i=1; i<=5; i=i+1) {                      // スイッチ1〜5に付いて
-    locateXY(2,i+1);
-    putCh(chr(ord('0')+i));                         // スイッチの番号
-    putStr(":");
-    char[] fname = mp3FilesGetName(i);              // 対応するファイル名
-    if (fname!=null) putStr(fname);
-  }
-  locateXY(2,7);
-  putStr("6:stop");                                 // 6番のスイッチ
-}
 
 char[] shuffle_font1 = { '\x94', '\x54', '\x34', '\x00', '\x28', '\x20', '\x18', '\x00' };
 char[] shuffle_font2 = { '\x2c', '\x24', '\xfc', '\x02', '\x31', '\x28', '\x24', '\x70' };
@@ -183,36 +172,54 @@ void operation_mode(int num){
   if (num==1){
     playing_plyalist_id = head_playlist+top_cursor;
     playing_music_id = 0;
+    sleep_cnt=0;
   }else if (num==2){
     dec();
+    sleep_cnt=0;
   } else if (num==3){
     inc();
-    set_sleep(); //この関数をtimerの割り込みで呼び出す
+    sleep_cnt=0;
   } else if(num==4){
     bottom_cursor = max(bottom_cursor-1, 0);
+    sleep_cnt=0;
   } else if(num==5){
     if(bottom_cursor==0){
-      //一曲飛ばす
-      //playing_music_idを増やしたり，もう増えないようにしたり
+      playing_music_id = max(playing_music_id-1,0);
+      //play(playling_playlist_id,playing_music_id);
     }
     else if(bottom_cursor==1){
       //再生・停止を切り替え
-      isplaying = !isplaying;
+      //isplaying = !isplaying; //藤村
+      isplaying = get_playing();
+    	if(playing == 0){play(playing_playlist_id, playing_music_id);}
+      else{stop();}
+    	isplaying = get_playing();
     }
     else if(bottom_cursor==2){
       //一曲戻す
-      //playing_music_idを減らしたり，もう減らないようにしたり
+      playing_music_id = min(playing_music_id+1,getMaxnumMusic(playing_playlist_id));
     }
     else if(bottom_cursor==3){
       //シャッフル切り替え
-      isshuffle = !isshuffle;
+      //isshuffle = !isshuffle;  //藤村
+      change_shuffle();
     }
     else if(bottom_cursor==4){
       //リピート切り替え
-      isrepeat = !isrepeat;
+      //isrepeat = !isrepeat;   //藤村
+      change_repeat();
     }
+    sleep_cnt=0;
   } else if (num==6){
     bottom_cursor = min(bottom_cursor+1, 4);
+    sleep_cnt=0;
+  } else{
+    if(sleep_cnt > 1000){
+    		sleep_cnt = 0;
+    		set_sleep();
+    }else{
+    		sleep_cnt = sleep_cnt + 1;
+    }
   }
 }
 
@@ -230,13 +237,6 @@ public void shellMain() {
     int num = swToNum(sw);
     if(issleep) sleep_mode(num);
     else operation_mode(num);
-      /* else if (num>0 && mp3FilesGetName(num)!=null) { // ファイルと対応するボタン
-        demoScreen();                                 // 画面を初期化
-        asta(num);                                    // 再生中の曲に印を表示
-        play(mp3FilesGetPath(num));                   // 再生開始
-        dbgPutStr(mp3FilesGetPath(num));
-        dbgPutStr("\n");
-      }*/
     sleep(10);                                      // 10ms に一度
   }
 }
