@@ -36,7 +36,8 @@
 #include "mp3Files.hmm"
 #include "shellProc.hmm"
 
-int N = 6;
+#define N 6 //変更点
+//int N = 6;
 int top_cursor = 0;
 int head_playlist = 0; //playlist count: 先頭に表示するプレイリストは何番目かを示す
 int bottom_cursor = 0; //下のカーソル
@@ -46,6 +47,7 @@ boolean isrepeat = false;
 int playing_plyalist_id = 0;
 int playing_music_id = 0;
 int cnt = 0;
+int sleep_cnt = 0; //変更点
 boolean issleep = false;
 
 int min(int x,int y){
@@ -183,17 +185,22 @@ void operation_mode(int num){
   if (num==1){
     playing_plyalist_id = head_playlist+top_cursor;
     playing_music_id = 0;
+    sleep_cnt = 0; //変更点
   }else if (num==2){
     dec();
+    sleep_cnt = 0; //変更点
   } else if (num==3){
     inc();
-    set_sleep(); //この関数をtimerの割り込みで呼び出す
+    //set_sleep(); //この関数をtimerの割り込みで呼び出す
+    sleep_cnt = 0; //変更点
   } else if(num==4){
     bottom_cursor = max(bottom_cursor-1, 0);
+    sleep_cnt = 0; //変更点
   } else if(num==5){
     if(bottom_cursor==0){
       //一曲飛ばす
       //playing_music_idを増やしたり，もう増えないようにしたり
+      playing_music_id = max(playing_music_id-1,0); //変更点
     }
     else if(bottom_cursor==1){
       //再生・停止を切り替え
@@ -202,6 +209,7 @@ void operation_mode(int num){
     else if(bottom_cursor==2){
       //一曲戻す
       //playing_music_idを減らしたり，もう減らないようにしたり
+      playing_music_id = min(playing_music_id+1,5); //変更点
     }
     else if(bottom_cursor==3){
       //シャッフル切り替え
@@ -213,6 +221,13 @@ void operation_mode(int num){
     }
   } else if (num==6){
     bottom_cursor = min(bottom_cursor+1, 4);
+  } else{ //変更点
+    if(sleep_cnt>1000){
+      sleep_cnt=0;
+      set_sleep();
+    }else{
+      sleep_cnt = sleep_cnt + 1;
+    }
   }
 }
 
