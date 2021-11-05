@@ -28,6 +28,19 @@
  *
  */
 
+//  Fujimura
+/*
 public void mp3FilesInit();               // 初期化（ファイル一覧を作る）
 public char[] mp3FilesGetName(int n);     // n 番目ファイル名を返す
 public char[] mp3FilesGetPath(int n);     // n 番目パス名を返す
+*/
+
+//  Kawamura
+///*
+public void mp3FilesInit();               // 初期化（ファイル一覧を作る）
+public char[] mp3FilesGetPath(int i,int j);     // (i,j) 番目のパス名を返す
+public char[] mp3FilesGetPlaylistName(int i); //i 番目のプレイリスト名を返す
+public char[] mp3FilesGetMusicName(int i,int j); //(i,j) 番目のファイル名を返す
+public int getMaximumPlaylist(); //プレイリストの総数を返す
+public int getMaximumMusic(int n); //n番目のプレイリストの曲数を返す
+//*/

@@ -1,3 +1,4 @@
+
 /*
  * TacOS Source Code
  *    Tokuyama kousen Advanced educational Computer.
@@ -26,6 +27,16 @@
  *
  */
 
-public boolean play(char[] path);
+public void play(int i, int j);
+public void play_next();
 public void stop();
 public void mp3Main();
+public void change_shuffle();
+public void change_repeat();
+public boolean get_finish();
+public boolean get_shuffle();
+public boolean get_repeat();
+public boolean get_playing();
+public int get_playing_playlist();
+public int get_playing_music();
+public int[] select_music();

@@ -1,0 +1,59 @@
+/*
+ * lcd2.cmm : 液晶管理
+ */
+
+#include "lcd.hmm"
+#include "mp3Files.hmm"
+
+public void mv_cursor(int top, int bottom){
+
+}
+
+public void disp_title(int playlist_cnt, int music_cnt){
+    locateXY(0,5);
+    putStr(mp3FilesGetPlaylistName(playlist_cnt));
+    locateXY(0,6);putStr(mp3FilesGetMusicName(playlist_cnt, music_cnt));
+}
+
+public void disp_top(int playlist_head, int playlist_cursor){
+    boolean iscursor = false;
+    for(int i=playlist_head; i<playlist_head+4; i=i+1){
+        if(i-playlist_head == playlist_cursor) iscursor = true;
+        else iscursor = false;
+        for(int j=0; j<9; j=j+1){
+            locateXY(4*(i-playlist_head)+j%3,1+j/3);
+            putplaylistfont(i,j,iscursor);
+        }
+    }
+}
+
+
+public void disp_bottom(int cursor, boolean isplaying, boolean isshuffle, boolean isrepeat){
+    boolean iscursor = false;
+    for(int i=0; i<5; i=i+1){
+        if(i==cursor)iscursor=true;
+        else iscursor=false;
+
+        if(i==0){
+            locateXY(0,7);
+            putoperationfont(0, iscursor);
+        }else if(i==1){
+            locateXY(2,7);
+            if(isplaying) putoperationfont(2, iscursor);
+            else putoperationfont(1, iscursor);
+        }else if(i==2){
+            locateXY(4,7);
+            putoperationfont(3, iscursor);
+        }else if(i==3){
+            locateXY(9,7);
+            if(isshuffle) putoperationfont(4, iscursor);
+            else putoperationfont(5, iscursor);
+        }else if(i==4){
+            locateXY(13,7);
+            if(isrepeat) putoperationfont(4, iscursor);
+            else putoperationfont(5, iscursor);
+        }
+    }
+}
+
+
