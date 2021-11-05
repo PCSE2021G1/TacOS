@@ -27,6 +27,7 @@
  * $Id$
  *
  */
+
 #include <kernel.hmm>
 #include <util.hmm>
 #include "lcd.hmm"
@@ -44,10 +45,12 @@ int bottom_cursor = 0; //下のカーソル
 boolean isplaying = false;
 boolean isshuffle = false;
 boolean isrepeat = false;
-int playing_playlist_id = 0;
-int playing_music_id = 0;
+
+int pre_playing_playlist_id = 0;
+int pre_playing_music_id = 0;
 int cnt = 0;
-int sleep_cnt = 0;
+int sleep_cnt = 0; //変更点
+
 boolean issleep = false;
 
 int min(int x,int y){
@@ -113,26 +116,26 @@ int swToNum(int sw) {
   }
   return num;
 }
-      
-//-----------------------------------------------------------------------------
-// 画面表示
-//-----------------------------------------------------------------------------
+
 
 char[] shuffle_font1 = { '\x94', '\x54', '\x34', '\x00', '\x28', '\x20', '\x18', '\x00' };
 char[] shuffle_font2 = { '\x2c', '\x24', '\xfc', '\x02', '\x31', '\x28', '\x24', '\x70' };
 char[] repeat_font1 = { '\x00', '\x0c', '\x40', '\x3c', '\x00', '\x3c', '\x28', '\x28' };
 char[] repeat_font2 = { '\x04', '\x10', '\x10', '\x00', '\x3c', '\x10', '\x00', '\x00' };
 
+
+
 void demoScreen() {
   cls();                                            // LCDをクリアする
   disp_top(head_playlist, top_cursor);
-  disp_title(playing_playlist_id, playing_music_id);
-  disp_bottom(bottom_cursor, isplaying, isshuffle, isrepeat);
+  disp_title(get_playing_playlist(), get_playing_music());
+  disp_bottom(bottom_cursor, get_playing(), get_shuffle(), get_repeat());
+
   locateXY(7,7);spiWriteLcdDat(shuffle_font1, 8);
   locateXY(8,7);spiWriteLcdDat(shuffle_font2, 8);
   locateXY(11,7);spiWriteLcdDat(repeat_font1, 8);
   locateXY(12,7);spiWriteLcdDat(repeat_font2, 8);
-  
+
 }
 
 int mylfsr = 1;
@@ -153,7 +156,9 @@ void move_y(){
   }
 }
 
-void set_sleep(){
+
+public void set_sleep(){
+
   issleep = true;
   cnt = 0;
   current_y = myrand()%7;
@@ -167,59 +172,68 @@ void sleep_mode(int num){
     sleep(10);
 }
 
+int[] pre_playing_playlist_music = {0,0};
 void operation_mode(int num){
   demoScreen();
+  if(get_finish()){play_next();}
   if (num==1){
-    playing_playlist_id = head_playlist+top_cursor;
-    playing_music_id = 0;
-    sleep_cnt=0;
+    pre_playing_playlist_id = head_playlist+top_cursor;
+    pre_playing_music_id = 0;
+    isplaying = get_playing();
+    if(isplaying) stop();
+    play(pre_playing_playlist_id, pre_playing_music_id);
+    sleep_cnt = 0;
   }else if (num==2){
     dec();
-    sleep_cnt=0;
+    sleep_cnt = 0;
   } else if (num==3){
     inc();
-    sleep_cnt=0;
+    sleep_cnt = 0;
   } else if(num==4){
     bottom_cursor = max(bottom_cursor-1, 0);
-    sleep_cnt=0;
+    sleep_cnt = 0;
   } else if(num==5){
     if(bottom_cursor==0){
-      playing_music_id = max(playing_music_id-1,0);
-      //play(playling_playlist_id,playing_music_id);
+      //一曲戻す
+      if(pre_playing_music_id>=getMaximumMusic(get_playing_playlist())-1) pre_playing_music_id = 0;
+      else pre_playing_music_id = pre_playing_music_id-1;
+      isplaying = get_playing();
+      if(isplaying) stop();
+      play(pre_playing_playlist_id, pre_playing_music_id);
     }
     else if(bottom_cursor==1){
       //再生・停止を切り替え
-      //isplaying = !isplaying; //藤村
       isplaying = get_playing();
-      if(isplaying == false)
-      	{play(playing_playlist_id, playing_music_id);}
-      else{stop();}
-    	isplaying = get_playing();
+      if(isplaying) stop();
+      else play(pre_playing_playlist_id, pre_playing_music_id);
     }
     else if(bottom_cursor==2){
-      //一曲戻す
-      playing_music_id = min(playing_music_id+1,getMaxnumMusic(playing_playlist_id));
+      //一曲飛ばす
+      pre_playing_playlist_music = select_music();
+      pre_playing_music_id = pre_playing_playlist_music[1];
+      isplaying = get_playing();
+      if(isplaying) stop();
+      play(pre_playing_playlist_id, pre_playing_music_id);
     }
     else if(bottom_cursor==3){
       //シャッフル切り替え
-      //isshuffle = !isshuffle;  //藤村
       change_shuffle();
+      isshuffle = get_shuffle();
     }
     else if(bottom_cursor==4){
       //リピート切り替え
-      //isrepeat = !isrepeat;   //藤村
       change_repeat();
+      isrepeat = get_repeat();
+
     }
-    sleep_cnt=0;
   } else if (num==6){
     bottom_cursor = min(bottom_cursor+1, 4);
-    sleep_cnt=0;
   } else{
-    if(sleep_cnt > 1000){
-    		sleep_cnt = 0;
-    		set_sleep();
+    if(sleep_cnt>1500){
+      sleep_cnt=0;
+      set_sleep();
     }else{
-    		sleep_cnt = sleep_cnt + 1;
+      sleep_cnt = sleep_cnt + 1;
     }
   }
 }
@@ -232,6 +246,9 @@ public void shellMain() {
   spiResetLcd();                                    // sleepを使用するので
   spiResetMp3();                                    //   プロセスが実行する
   mp3FilesInit();                                   // ファイル一覧を作る
+  isplaying = get_playing();
+  isshuffle = get_shuffle();
+  isrepeat = get_repeat();
   demoScreen();                                     // 画面を初期化
   for (;;) {
     int sw = readSw();
