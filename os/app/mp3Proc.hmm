@@ -26,16 +26,8 @@
  * 2020.08.30 : 新規作成
  *
  */
-//  Fujimrua
-/*
-public boolean play(char[] path);
-public void stop();
-public void mp3Main();
-*/
-//  Kawamura
-///*
+
 public void play(int i, int j);
-//public int[] play_next();
 public void play_next();
 public void stop();
 public void mp3Main();
@@ -48,4 +40,3 @@ public boolean get_playing();
 public int get_playing_playlist();
 public int get_playing_music();
 public int[] select_music();
-//*/

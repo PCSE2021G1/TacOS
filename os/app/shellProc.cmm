@@ -38,17 +38,19 @@
 #include "shellProc.hmm"
 
 #define N 6
-//int N = 6;
+
 int top_cursor = 0;
 int head_playlist = 0; //playlist count: 先頭に表示するプレイリストは何番目かを示す
 int bottom_cursor = 0; //下のカーソル
 boolean isplaying = false;
 boolean isshuffle = false;
 boolean isrepeat = false;
+
 int pre_playing_playlist_id = 0;
 int pre_playing_music_id = 0;
 int cnt = 0;
 int sleep_cnt = 0; //変更点
+
 boolean issleep = false;
 
 int min(int x,int y){
@@ -115,10 +117,12 @@ int swToNum(int sw) {
   return num;
 }
 
+
 char[] shuffle_font1 = { '\x94', '\x54', '\x34', '\x00', '\x28', '\x20', '\x18', '\x00' };
 char[] shuffle_font2 = { '\x2c', '\x24', '\xfc', '\x02', '\x31', '\x28', '\x24', '\x70' };
 char[] repeat_font1 = { '\x00', '\x0c', '\x40', '\x3c', '\x00', '\x3c', '\x28', '\x28' };
 char[] repeat_font2 = { '\x04', '\x10', '\x10', '\x00', '\x3c', '\x10', '\x00', '\x00' };
+
 
 
 void demoScreen() {
@@ -126,10 +130,12 @@ void demoScreen() {
   disp_top(head_playlist, top_cursor);
   disp_title(get_playing_playlist(), get_playing_music());
   disp_bottom(bottom_cursor, get_playing(), get_shuffle(), get_repeat());
+
   locateXY(7,7);spiWriteLcdDat(shuffle_font1, 8);
   locateXY(8,7);spiWriteLcdDat(shuffle_font2, 8);
   locateXY(11,7);spiWriteLcdDat(repeat_font1, 8);
   locateXY(12,7);spiWriteLcdDat(repeat_font2, 8);
+
 }
 
 int mylfsr = 1;
@@ -150,7 +156,9 @@ void move_y(){
   }
 }
 
+
 public void set_sleep(){
+
   issleep = true;
   cnt = 0;
   current_y = myrand()%7;
