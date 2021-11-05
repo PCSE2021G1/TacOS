@@ -3,26 +3,16 @@
  */
 
 #include "lcd.hmm"
+#include "mp3Files.hmm"
 
 public void mv_cursor(int top, int bottom){
 
 }
 
 public void disp_title(int playlist_cnt, int music_cnt){
-    //本当はここで判定するのではなく，このplaylist_cntをmp3fileに渡して，返り値を表示する．
-    //テストの段階で楽しむためにif文を書いた．
-  locateXY(0,5);
-  if(playlist_cnt==0) putStr("PlaylistA");
-  else if(playlist_cnt==1) putStr("PlaylistB");
-  else if(playlist_cnt==2) putStr("PlaylistC");
-  else if(playlist_cnt==3) putStr("PlaylistD");
-  else if(playlist_cnt==4) putStr("PlaylistE");
-  else if(playlist_cnt==5) putStr("PlaylistF");
-  locateXY(0,6);putStr("music1.mp3");
-  /*
-  locateXY(0,5);putStr(getPlaylistname(playlist_cnt));
-  locateXY(0,6);putStr(getMusicname(playlist_cnt, music_cnt));
-  */
+    locateXY(0,5);
+    putStr(mp3FilesGetPlaylistName(playlist_cnt));
+    locateXY(0,6);putStr(mp3FilesGetMusicName(playlist_cnt, music_cnt));
 }
 
 public void disp_top(int playlist_head, int playlist_cursor){
@@ -49,8 +39,8 @@ public void disp_bottom(int cursor, boolean isplaying, boolean isshuffle, boolea
             putoperationfont(0, iscursor);
         }else if(i==1){
             locateXY(2,7);
-            if(isplaying) putoperationfont(1, iscursor);
-            else putoperationfont(2, iscursor);
+            if(isplaying) putoperationfont(2, iscursor);
+            else putoperationfont(1, iscursor);
         }else if(i==2){
             locateXY(4,7);
             putoperationfont(3, iscursor);
