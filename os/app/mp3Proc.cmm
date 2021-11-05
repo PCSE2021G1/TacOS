@@ -150,6 +150,16 @@ public int get_playing_music(){
 // MP3 データ用のバッファ
 char[] buf = array(BUFSIZ);
 
+// 曲が自動で次に再生するようにする
+void play_next() {
+  if (repeat==true) play(playing_playlist_id, playing_music_id);
+  else if (shuffle==true) play(playing_playlist_id, rand()%get_maximum_music(playing_playlist_id)+1);
+  else {
+    if (music_id == get_maximum_music(playing_playlist_id)) play(playing_playlist_id, 0);
+    else play(playing_playlist_id, playing_music_id=playing_playlist_id+1);
+  }
+}
+
 // 音楽データをデコーダに送る
 void trans_data(char[] path) {
   int fd = open(path, READ_MODE);           // ファイルをオープン
