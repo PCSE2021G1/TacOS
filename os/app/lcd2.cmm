@@ -5,9 +5,6 @@
 #include "lcd.hmm"
 #include "mp3Files.hmm"
 
-public void mv_cursor(int top, int bottom){
-
-}
 
 public void disp_title(int playlist_cnt, int music_cnt){
     locateXY(0,5);
